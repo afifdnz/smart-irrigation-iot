@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  db-irrigation:
+    image: mysql:8.0
+    container_name: mysql-irrigation-container
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: iot_irrigation_db
+      MYSQL_USER: user_iot
+      MYSQL_PASSWORD: password_iot
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data_irrigation:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-proot_password",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-irrigation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: go-backend-container
+    restart: unless-stopped
+    depends_on:
+      db-irrigation:
+        condition: service_healthy
+    environment:
+      DB_DSN: "user_iot:password_iot@tcp(db-irrigation:3306)/iot_irrigation_db?parseTime=true"
+      APP_PORT: "8080"
+    ports:
+      - "8080:8080"
+
+  pma-irrigation:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    restart: unless-stopped
+    environment:
+      PMA_HOST: db-irrigation
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+    ports:
+      - "8081:80"
+    depends_on:
+      db-irrigation:
+        condition: service_healthy
+
+volumes:
+  mysql_data_irrigation:
