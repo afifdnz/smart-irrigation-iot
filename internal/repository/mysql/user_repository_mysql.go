@@ -19,10 +19,10 @@ func NewUserRepository(db *sql.DB) repository.UserRepository {
 
 func (r *userRepository) FindByUsername(ctx context.Context, username string) (*domains.User, error) {
 	query := `
-		SElECT id, username, password_hash, email, created_at, last_login
-		FROM users 
-		WHERE username = ?
-	`
+        SELECT id, username, password_hash, email, created_at, last_login
+        FROM users
+        WHERE username = ?`
+
 	user := &domains.User{}
 	err := r.db.QueryRowContext(ctx, query, username).Scan(
 		&user.ID,
@@ -32,7 +32,6 @@ func (r *userRepository) FindByUsername(ctx context.Context, username string) (*
 		&user.CreatedAt,
 		&user.LastLogin,
 	)
-
 	if err == sql.ErrNoRows {
 		return nil, domains.ErrInvalidCredentials
 	}

@@ -43,6 +43,7 @@ services:
       DB_DSN: "user_iot:password_iot@tcp(db-irrigation:3306)/iot_irrigation_db?parseTime=true"
       MQTT_BROKER: "tcp://mosquitto:1883"
       APP_PORT: "8080"
+      JWT_SECRET: "atVL+u5lT/D3MTp+Nu6dRvHfNRDHUHdVdX2Jv9ienxw="
     ports:
       - "8080:8080"
 

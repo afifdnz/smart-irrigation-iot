@@ -8,7 +8,7 @@ import (
 	"github.com/afifdnz/irrigation-iot/internal/pkg/jwtutil"
 )
 
-func AuthMiddleware(secret string, next http.Handler) http.Handler {
+func AuthMiddleware(secret string, next http.Handler) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {

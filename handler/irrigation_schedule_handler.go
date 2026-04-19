@@ -7,6 +7,7 @@ import (
 
 	"github.com/afifdnz/irrigation-iot/domains"
 	"github.com/afifdnz/irrigation-iot/internal/pkg/httputil"
+	"github.com/afifdnz/irrigation-iot/internal/pkg/jwtutil"
 	"github.com/afifdnz/irrigation-iot/internal/pkg/response"
 	"github.com/afifdnz/irrigation-iot/service"
 )
@@ -70,7 +71,8 @@ func (h *IrrigationScheduleHandler) Create(w http.ResponseWriter, r *http.Reques
 	}
 
 	// createdBy sementara 0 dulu, nanti diisi dari JWT claims
-	if err := h.scheduleService.Create(r.Context(), schedule, 1); err != nil {
+	claims, _ := jwtutil.GetClaims(r.Context())
+	if err := h.scheduleService.Create(r.Context(), schedule, claims.UserID); err != nil {
 		if err == domains.ErrPlotNotFound {
 			response.NotFound(w, "plot not found")
 			return

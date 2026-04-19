@@ -28,6 +28,11 @@ func main() {
 		dsn = "user_iot:password_iot@tcp(localhost:3307)/iot_irrigation_db?parseTime=true"
 	}
 
+	jwtSecret := os.Getenv("JWT_SECRET")
+	if jwtSecret == "" {
+		log.Fatal("JWT_SECRET tidak boleh kosong")
+	}
+
 	db, err := storage.NewMySQL(dsn)
 	if err != nil {
 		log.Fatalf("gagal koneksi database: %v", err)
@@ -65,7 +70,7 @@ func main() {
 	scheduleRepo := mysqlrepo.NewIrrigationScheduleRepository(db)
 
 	// Service
-	userService := service.NewUserService(userRepo)
+	userService := service.NewUserService(userRepo, jwtSecret)
 	plotService := service.NewPlotService(plotRepo)
 	tankService := service.NewWaterTankService(tankRepo)
 	configService := service.NewPlantConfigService(configRepo, plotRepo)
@@ -89,6 +94,7 @@ func main() {
 	mux := http.NewServeMux()
 	server.SetupRoutes(
 		mux,
+		jwtSecret,
 		userHandler,
 		plotHandler,
 		tankHandler,

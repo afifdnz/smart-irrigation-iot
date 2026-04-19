@@ -3,6 +3,8 @@ package domains
 import (
 	"time"
 	"unicode/utf8"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -21,9 +23,13 @@ func (u *User) IsPasswordValid(plain string) bool {
 	return true
 }
 
+//	func (u *User) IsPasswordMatch(plain string) bool {
+//		if plain != u.Password {
+//			return false
+//		}
+//		return true
+//	}
 func (u *User) IsPasswordMatch(plain string) bool {
-	if plain != u.Password {
-		return false
-	}
-	return true
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
+	return err == nil
 }
