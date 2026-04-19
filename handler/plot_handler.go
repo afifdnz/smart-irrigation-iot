@@ -46,7 +46,7 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		PlotName  string `json:"plot_name"`
 		PlantName string `json:"plant_name"`
-		PlantNote string `json:"plant_note"`
+		PlantNote string `json:"plant_notes"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -59,7 +59,7 @@ func (h *PlotHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	plot := &domains.Plot{
-		PlotName:  req.PlantName,
+		PlotName:  req.PlotName,
 		PlantName: req.PlantName,
 		PlantNote: req.PlantNote,
 	}
@@ -81,7 +81,7 @@ func (h *PlotHandler) Update(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		PlotName  string `json:"plot_name"`
 		PlantName string `json:"plant_name"`
-		PlantNote string `jsoon:"plant_note"`
+		PlantNote string `json:"plant_notes"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

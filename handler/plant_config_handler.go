@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/afifdnz/irrigation-iot/domains"
@@ -34,8 +35,13 @@ func (h *PlantConfigHandler) GetByPlotID(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *PlantConfigHandler) Create(w http.ResponseWriter, r *http.Request) {
+	plotID, err := httputil.ParseIDFromPath(r, "plot_id")
+	if err != nil {
+		response.BadRequest(w, "plot_id not valid")
+		return
+	}
+
 	var req struct {
-		PlotID         int     `json:"plot_id"`
 		TankID         int     `json:"tank_id"`
 		MoistureMinPct float64 `json:"moisture_min_pct"`
 		MoistureMaxPct float64 `json:"moisture_max_pct"`
@@ -47,14 +53,14 @@ func (h *PlantConfigHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	config := &domains.PlantConfig{
-		PlotID:         req.PlotID,
+		PlotID:         plotID,
 		TankID:         req.TankID,
 		MoistureMinPct: req.MoistureMinPct,
 		MoistureMaxPct: req.MoistureMaxPct,
 	}
 
 	// updatedBy sementara 0 dulu, nanti diisi dari JWT claims
-	if err := h.configService.Create(r.Context(), config, 0); err != nil {
+	if err := h.configService.Create(r.Context(), config, 1); err != nil {
 		switch err {
 		case domains.ErrPlotNotFound:
 			response.NotFound(w, "plot not found")
@@ -65,6 +71,7 @@ func (h *PlantConfigHandler) Create(w http.ResponseWriter, r *http.Request) {
 		default:
 			response.InternalError(w, "failed to create config")
 		}
+		log.Printf("Plant Config: %v", err)
 		return
 	}
 	response.Created(w, "success to create config", config)
@@ -96,7 +103,7 @@ func (h *PlantConfigHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// updatedBy sementara 0 dulu, nanti diisi dari JWT claims
-	if err := h.configService.Update(r.Context(), config, 0); err != nil {
+	if err := h.configService.Update(r.Context(), config, 1); err != nil {
 		switch err {
 		case domains.ErrConfigNotFound:
 			response.NotFound(w, "config not found")

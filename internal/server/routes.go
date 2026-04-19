@@ -37,10 +37,11 @@ func SetupRoutes(
 	mux.HandleFunc("GET  /api/plots/{plot_id}/config", configHandler.GetByPlotID)
 	mux.HandleFunc("POST /api/plots/{plot_id}/config", configHandler.Create)
 	mux.HandleFunc("PUT  /api/plots/{plot_id}/config", configHandler.Update)
+
 	// Sensor Readings
-	mux.HandleFunc("GET  /api/petaks/{plot_id}/sensors", sensorHandler.GetByPlotID)
-	mux.HandleFunc("GET  /api/petaks/{plot_id}/sensors/latest", sensorHandler.GetLatest)
-	mux.HandleFunc("POST /api/petaks/{plot_id}/sensors", sensorHandler.Record)
+	mux.HandleFunc("GET  /api/plots/{plot_id}/sensors", sensorHandler.GetByPlotID)
+	mux.HandleFunc("GET  /api/plots/{plot_id}/sensors/latest", sensorHandler.GetLatest)
+	mux.HandleFunc("POST /api/plots/{plot_id}/sensors", sensorHandler.Record)
 
 	// Water Level Logs
 	mux.HandleFunc("GET  /api/tanks/{tank_id}/levels", waterLevelHandler.GetByTankID)

@@ -70,7 +70,7 @@ func (h *IrrigationScheduleHandler) Create(w http.ResponseWriter, r *http.Reques
 	}
 
 	// createdBy sementara 0 dulu, nanti diisi dari JWT claims
-	if err := h.scheduleService.Create(r.Context(), schedule, 0); err != nil {
+	if err := h.scheduleService.Create(r.Context(), schedule, 1); err != nil {
 		if err == domains.ErrPlotNotFound {
 			response.NotFound(w, "plot not found")
 			return

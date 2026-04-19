@@ -18,4 +18,6 @@ var (
 	ErrConfigNotFound               = errors.New("config not found!")
 	ErrWaterLevelNotFound           = errors.New("water level not found!")
 	ErrScheduleNotFound             = errors.New("schedule not found!")
+	ErrSensorNotFound               = errors.New("sensor not found!")
+	ErrActuatorLogNotFound          = errors.New("actuator log not found")
 )
