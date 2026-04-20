@@ -42,12 +42,12 @@ func (s *userService) Login(ctx context.Context, username, password string) (str
 	}
 
 	if !user.IsPasswordMatch(password) {
-		return "", err
+		return "", domains.ErrInvalidCredentials
 	}
 	if err := s.userRepo.UpdateLastLogin(ctx, user.ID, time.Now()); err != nil {
 		return "", err
 	}
-	token, err := jwtutil.GenerateToken(user.ID, user.Username, user.Password, s.jwtSecret)
+	token, err := jwtutil.GenerateToken(user.ID, user.Username, user.Email, s.jwtSecret)
 	if err != nil {
 		return "", err
 	}

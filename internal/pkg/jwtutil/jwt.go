@@ -2,6 +2,7 @@ package jwtutil
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -32,6 +33,8 @@ func GenerateToken(userID int, username, email, secret string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	log.Printf("jwtSecret di GenerateToken %v", secret)
+	log.Printf("token di GenerateToken %v", token)
 	return token.SignedString([]byte(secret))
 }
 

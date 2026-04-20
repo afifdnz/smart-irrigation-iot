@@ -7,6 +7,7 @@ import (
 
 	"github.com/afifdnz/irrigation-iot/handler"
 	// "github.com/afifdnz/irrigation-iot/internal/repository/inmemory"
+	"github.com/afifdnz/irrigation-iot/internal/pkg/middleware"
 	mysqlrepo "github.com/afifdnz/irrigation-iot/internal/repository/mysql"
 	"github.com/afifdnz/irrigation-iot/internal/server"
 	"github.com/afifdnz/irrigation-iot/internal/storage"
@@ -29,6 +30,7 @@ func main() {
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
+	log.Printf("JWT_SECRET: '%s'", jwtSecret)
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET tidak boleh kosong")
 	}
@@ -104,6 +106,13 @@ func main() {
 		actuatorHandler,
 		scheduleHandler,
 	)
+
+	handler := middleware.CORSMiddleware(mux)
+
+	log.Printf("server berjalan di :%s", port)
+	if err := http.ListenAndServe(":"+port, handler); err != nil {
+		log.Fatalf("server error: %v", err)
+	}
 
 	mqttBroker := os.Getenv("MQTT_BROKER")
 	if mqttBroker == "" {

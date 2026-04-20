@@ -27,14 +27,13 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		response.BadRequest(w, "request body not valid")
 		return
 	}
-	log.Printf("Password User: %v", req.Password)
 	if req.Username == "" || req.Password == "" {
 		response.BadRequest(w, "username and password not valid")
 		return
 	}
 	token, err := h.userService.Login(r.Context(), req.Username, req.Password)
+	log.Printf("Token: %v", token)
 	if err != nil {
-		log.Printf("Error: ", err)
 		response.Unauthorized(w, "usename and password are wrong")
 		return
 	}
