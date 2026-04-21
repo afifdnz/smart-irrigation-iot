@@ -73,6 +73,17 @@ services:
       - mosquitto_data:/mosquitto/data
       - mosquitto_log:/mosquitto/log
 
+  frontend-irrigation:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    container_name: react-frontend-container
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend-irrigation
+
 volumes:
   mysql_data_irrigation:
   mosquitto_data:
