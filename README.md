@@ -1,6 +1,6 @@
 # IoT Smart Irrigation Backend
 
-Backend service for a Smart Irrigation system connecting hardware nodes (ESP8266/Microcontrollers) with a frontend dashboard (React). This system is built using **Go (Golang)** applying **Clean Architecture** principles (Domains, Handlers, Services, Repositories) and supports dual communication protocols (HTTP and MQTT).
+Backend service for a Smart Irrigation system connecting hardware nodes (ESP8266/Microcontrollers) with a frontend dashboard (React). This system is built using **Go (Golang)** applying **Clean Architecture** principles and supports dual communication protocols (HTTP and MQTT).
 
 ## 🚀 Key Features
 
@@ -17,22 +17,30 @@ Backend service for a Smart Irrigation system connecting hardware nodes (ESP8266
 * **Programming Language:** Go (Golang)
 * **Database:** MySQL
 * **IoT Protocol:** MQTT (Paho MQTT Client)
-* **Infrastructure:** Docker & Docker Compose (Optional)
+* **Infrastructure:** Docker & Docker Compose
 
-## 📁 Directory Structure (Clean Architecture)
+## 📁 Directory Structure
 
-This project is separated based on technical responsibilities to ensure maintainability and scalability:
+This project utilizes a monorepo approach, housing the backend, frontend, and broker configurations together:
 ```txt
-├── cmd/
-│   └── main.go                 # Main application entry point (HTTP & MQTT Initialization)
-├── internal/
-│   ├── domains/                # Entity definitions (Structs) and contracts (Interfaces)
-│   ├── handler/                # Request entry points (HTTP API Controllers & MQTT Subscribers)
-│   ├── service/                # Irrigation system business logic (Usecases)
-│   └── repository/             # Direct MySQL database access (SQL Queries)
-├── pkg/
-│   └── middleware/             # Intermediary logic such as JWT Auth & CORS
-└── go.mod
+├── domains/                # Entity definitions (Structs) and contracts (Interfaces)
+├── frontend/               # React frontend application source code
+├── handler/                # Request entry points (HTTP API Controllers & MQTT Subscribers)
+├── internal/               # Internal application packages
+│   ├── pkg/                # Utility packages (httputil, jwtutil, middleware, response)
+│   ├── repository/         # Database implementations (inmemory, mysql)
+│   ├── server/             # Server routing configuration (routes.go)
+│   └── storage/            # Database connection setup (mysql.go)
+├── mosquitto/              # MQTT Broker configuration files
+│   └── config/
+│       └── mosquitto.conf
+├── repository/             # Repository interfaces (Contracts)
+├── service/                # Irrigation system business logic (Usecases)
+├── Dockerfile              # Docker image configuration for the backend
+├── docker-compose.yaml     # Container orchestration for Go, MySQL, and Mosquitto
+├── go.mod                  # Go module dependencies
+├── go.sum                  # Go module checksums
+└── main.go                 # Main application entry point (HTTP & MQTT Initialization)
 ```
 ## 📡 MQTT Topic Communication Flow
 
@@ -48,17 +56,16 @@ The backend actively subscribes to and publishes messages to the broker via the 
 
 Before running the application, ensure your system has the following installed:
 * [Go](https://go.dev/) (version 1.18 or newer)
-* MySQL Server
-* MQTT Broker (e.g., Eclipse Mosquitto, EMQX, or HiveMQ)
-* Docker (Optional, for containerization)
+* Docker & Docker Compose (Recommended for running the full stack)
+* Node.js & npm (If running the frontend locally)
 
 ## 🔧 Installation & Configuration
 
 1.  **Clone this repository:**
-    git clone https://github.com/username/irrigation-backend.git
-    cd irrigation-backend
+    git clone https://github.com/username/irrigation-iot.git
+    cd irrigation-iot
 
-2.  **Install dependencies:**
+2.  **Install Go dependencies:**
     go mod tidy
 
 3.  **Environment Variables Setup:**
@@ -67,17 +74,16 @@ Before running the application, ensure your system has the following installed:
     DB_DSN=user_iot:password_iot@tcp(localhost:3307)/iot_irrigation_db?parseTime=true&loc=UTC
     MQTT_BROKER=tcp://localhost:1883
     JWT_SECRET=your_system_secret
-    
-    *(Note: Adding the `?parseTime=true&loc=UTC` parameter to the DSN is crucial for Go to accurately parse SQL time data types).*
 
 ## ▶️ Running the Application
 
-**Locally (Without Docker):**
-go run cmd/main.go
-
-**Using Docker Compose:**
-If you have included the `docker-compose.yml`, run the following command to initiate the Go server alongside MySQL and the MQTT Broker:
+**Using Docker Compose (Recommended):**
+This will spin up the Go backend, MySQL database, and Mosquitto MQTT broker simultaneously.
 docker-compose up -d --build
+
+**Locally (Without Docker):**
+Make sure your local MySQL and MQTT broker are running, then execute:
+go run main.go
 
 Once the application is running, the initialization logs will appear in your terminal:
 Berhasil terhubung ke MQTT Broker
