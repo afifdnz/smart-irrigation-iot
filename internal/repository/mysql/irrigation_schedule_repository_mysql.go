@@ -3,6 +3,7 @@ package mysql
 import (
 	"context"
 	"database/sql"
+	"time"
 
 	"github.com/afifdnz/irrigation-iot/domains"
 	"github.com/afifdnz/irrigation-iot/repository"
@@ -58,12 +59,27 @@ func (r *irrigationScheduleRepository) FindByPlotID(ctx context.Context, plotID 
 	schedules := make([]*domains.IrrigationSchedule, 0)
 	for rows.Next() {
 		s := &domains.IrrigationSchedule{}
+
+		// 1. Buat variabel sementara untuk menampung data TIME dari MySQL
+		var rawStartTime []byte
+
 		if err := rows.Scan(
-			&s.ID, &s.PlotID, &s.StartTime, &s.DurationSeconds,
+			&s.ID, &s.PlotID, &rawStartTime, &s.DurationSeconds,
 			&s.DaysOfWeek, &s.IsActive, &s.CreatedBy, &s.CreatedAt,
 		); err != nil {
 			return nil, err
 		}
+
+		// 2. Ubah byte mentah (misal: "06:00:00") menjadi tipe time.Time Go
+		// Di Go, format acuan parsing waktu selalu menggunakan "15:04:05"
+		parsedTime, err := time.Parse("15:04:05", string(rawStartTime))
+		if err == nil {
+			s.StartTime = parsedTime
+		} else {
+			// Jika Anda ingin melihat log jika parsing gagal
+			// log.Printf("Gagal parsing waktu: %v", err)
+		}
+
 		schedules = append(schedules, s)
 	}
 	return schedules, rows.Err()

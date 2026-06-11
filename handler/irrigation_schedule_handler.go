@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -29,6 +30,7 @@ func (h *IrrigationScheduleHandler) GetByPetakID(w http.ResponseWriter, r *http.
 
 	schedules, err := h.scheduleService.GetByPlotID(r.Context(), plotID)
 	if err != nil {
+		log.Printf("[DEBUG] Error GetByPlotID: %v\n", err)
 		response.InternalError(w, "failed to retrieve irrigation scheulde")
 		return
 	}

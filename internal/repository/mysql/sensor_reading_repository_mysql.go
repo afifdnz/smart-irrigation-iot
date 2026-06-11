@@ -18,7 +18,7 @@ func NewSensorReadingRepository(db *sql.DB) repository.SensorReadingRepository {
 
 func (r *sensorReadingRepository) FindByPlotID(ctx context.Context, plotID int, limit, offset int) ([]*domains.SensorReading, error) {
 	query := `
-		SELECT id, plot_id, soil_moisture_pct, status_tanah, recorded_at
+		SELECT id, plot_id, soil_moisture_pct, status_tanah, ai_pred_mins, recorded_at
 		FROM sensor_readings
 		WHERE plot_id = ? 
 		ORDER BY recorded_at DESC 
@@ -36,7 +36,7 @@ func (r *sensorReadingRepository) FindByPlotID(ctx context.Context, plotID int, 
 		s := &domains.SensorReading{}
 		if err := rows.Scan(
 			&s.ID, &s.PlotID, &s.SoilMoisturePct,
-			&s.Status, &s.RecordedAt,
+			&s.Status, &s.AiPredMins, &s.RecordedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -47,7 +47,7 @@ func (r *sensorReadingRepository) FindByPlotID(ctx context.Context, plotID int, 
 
 func (r *sensorReadingRepository) FindLatestByPlotID(ctx context.Context, plotID int) (*domains.SensorReading, error) {
 	query := `
-		SELECT id, plot_id, soil_moisture_pct, status_tanah, recorded_at
+		SELECT id, plot_id, soil_moisture_pct, status_tanah, ai_pred_mins, recorded_at
 		FROM sensor_readings
 		WHERE plot_id = ?
 		ORDER BY recorded_at DESC
@@ -55,7 +55,7 @@ func (r *sensorReadingRepository) FindLatestByPlotID(ctx context.Context, plotID
 	`
 	s := &domains.SensorReading{}
 	err := r.db.QueryRowContext(ctx, query, plotID).Scan(
-		&s.ID, &s.PlotID, &s.SoilMoisturePct, &s.Status, &s.RecordedAt,
+		&s.ID, &s.PlotID, &s.SoilMoisturePct, &s.Status, &s.AiPredMins, &s.RecordedAt,
 	)
 	if err == sql.ErrNoRows {
 		return nil, domains.ErrSensorNotFound
@@ -68,12 +68,12 @@ func (r *sensorReadingRepository) FindLatestByPlotID(ctx context.Context, plotID
 
 func (r *sensorReadingRepository) Create(ctx context.Context, reading *domains.SensorReading) error {
 	query := `
-        INSERT INTO sensor_readings (plot_id, soil_moisture_pct, status_tanah, recorded_at)
-        VALUES (?, ?, ?, ?)`
+        INSERT INTO sensor_readings (plot_id, soil_moisture_pct, status_tanah, ai_pred_mins, recorded_at)
+        VALUES (?, ?, ?, ?, ?)`
 
 	result, err := r.db.ExecContext(ctx, query,
 		reading.PlotID, reading.SoilMoisturePct,
-		reading.Status, reading.RecordedAt,
+		reading.Status, reading.AiPredMins, reading.RecordedAt,
 	)
 	if err != nil {
 		return err

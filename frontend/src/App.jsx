@@ -9,6 +9,8 @@ import Tanks from './pages/Tanks';
 import TankDetail from './pages/TankDetail';
 import Schedules from './pages/Schedules';
 import Settings from './pages/Settings';
+import Monitoring from './pages/Monitoring';
+import Control from './pages/Control.jsx';
 
 export default function App() {
   return (
@@ -20,6 +22,16 @@ export default function App() {
         <Route path="/dashboard" element={
           <PrivateRoute>
             <Layout><Dashboard /></Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/monitoring" element={
+          <PrivateRoute>
+            <Layout><Monitoring /></Layout>
+          </PrivateRoute>
+        } />
+        <Route path="/control" element={
+          <PrivateRoute>
+            <Layout><Control /></Layout>
           </PrivateRoute>
         } />
         <Route path="/plots" element={

@@ -66,14 +66,14 @@ func (r *waterLevelLogRepository) FindLatestByTankID(ctx context.Context, tankID
 	return l, nil
 }
 
-func (r *waterLevelLogRepository) Create(ctx context.Context, log *domains.WaterLevelLog) error {
+func (r *waterLevelLogRepository) Create(ctx context.Context, log1 *domains.WaterLevelLog) error {
 	query := `
         INSERT INTO water_level_logs (tank_id, water_level_cm, water_volume_l, recorded_at)
         VALUES (?, ?, ?, ?)`
 
 	result, err := r.db.ExecContext(ctx, query,
-		log.TankID, log.WaterLevelCm,
-		log.WaterVolume, log.RecordedAt,
+		log1.TankID, log1.WaterLevelCm,
+		log1.WaterVolume, log1.RecordedAt,
 	)
 	if err != nil {
 		return err
@@ -83,6 +83,6 @@ func (r *waterLevelLogRepository) Create(ctx context.Context, log *domains.Water
 	if err != nil {
 		return err
 	}
-	log.ID = int(id)
+	log1.ID = int(id)
 	return nil
 }

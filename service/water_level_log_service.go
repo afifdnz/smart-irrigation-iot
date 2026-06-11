@@ -40,7 +40,7 @@ func (s *waterLevelLogService) Record(ctx context.Context, log *domains.WaterLev
 		return domains.ErrWaterTankNotFound
 	}
 
-	log.WaterLevelCm = tank.CalculateVolume(log.WaterLevelCm)
+	log.WaterVolume = tank.CalculateVolume(log.WaterLevelCm)
 	log.RecordedAt = time.Now()
 	return s.logRepo.Create(ctx, log)
 }

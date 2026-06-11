@@ -5,9 +5,9 @@ import "time"
 type LandStatus string
 
 const (
-	DryStatus     LandStatus = "Dry"
-	OptimalStatus LandStatus = "Optimal"
-	WetStatus     LandStatus = "Wet"
+	DryStatus     LandStatus = "kering"
+	OptimalStatus LandStatus = "optimal"
+	WetStatus     LandStatus = "basah"
 )
 
 type SensorReading struct {
@@ -15,6 +15,7 @@ type SensorReading struct {
 	PlotID          int
 	SoilMoisturePct float64
 	Status          LandStatus
+	AiPredMins      *float64
 	RecordedAt      time.Time
 }
 

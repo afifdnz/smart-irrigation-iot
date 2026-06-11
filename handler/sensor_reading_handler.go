@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/afifdnz/irrigation-iot/domains"
@@ -52,8 +53,9 @@ func (h *SensorReadingHandler) GetLatest(w http.ResponseWriter, r *http.Request)
 
 func (h *SensorReadingHandler) Record(w http.ResponseWriter, r *http.Request) {
 	var req struct {
-		PlotID          int     `json:"plot_id"`
-		SoilMoisturePct float64 `json:"soil_moisture_pct"`
+		PlotID          int      `json:"plot_id"`
+		SoilMoisturePct float64  `json:"soil_moisture_pct"`
+		AiPredMins      *float64 `json:"ai_pred_mins"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -64,9 +66,11 @@ func (h *SensorReadingHandler) Record(w http.ResponseWriter, r *http.Request) {
 	reading := &domains.SensorReading{
 		PlotID:          req.PlotID,
 		SoilMoisturePct: req.SoilMoisturePct,
+		AiPredMins:      req.AiPredMins,
 	}
 
 	if err := h.readingService.Record(r.Context(), reading); err != nil {
+		log.Printf("Error [SensorReading]: %v", err)
 		if err == domains.ErrConfigNotFound {
 			response.NotFound(w, "plot config not found")
 			return

@@ -26,11 +26,11 @@ func main() {
 	dsn := os.Getenv("DB_DSN")
 	if dsn == "" {
 		// Fallback untuk development lokal tanpa docker
-		dsn = "user_iot:password_iot@tcp(localhost:3307)/iot_irrigation_db?parseTime=true"
+		dsn = "user_iot:password_iot@tcp(localhost:3307)/iot_irrigation_db?parseTime=true&loc=UTC"
 	}
 
 	jwtSecret := os.Getenv("JWT_SECRET")
-	log.Printf("JWT_SECRET: '%s'", jwtSecret)
+	// log.Printf("JWT_SECRET: '%s'", jwtSecret)
 	if jwtSecret == "" {
 		log.Fatal("JWT_SECRET tidak boleh kosong")
 	}
@@ -106,14 +106,6 @@ func main() {
 		actuatorHandler,
 		scheduleHandler,
 	)
-
-	handler := middleware.CORSMiddleware(mux)
-
-	log.Printf("server berjalan di :%s", port)
-	if err := http.ListenAndServe(":"+port, handler); err != nil {
-		log.Fatalf("server error: %v", err)
-	}
-
 	mqttBroker := os.Getenv("MQTT_BROKER")
 	if mqttBroker == "" {
 		mqttBroker = "tcp://localhost:1883"
@@ -129,6 +121,13 @@ func main() {
 		log.Println("Berhasil terhubung ke MQTT Broker")
 		client.Subscribe("iot/sensors", 1, mqttHandler.HandleSensorReading)
 		client.Subscribe("iot/levels", 1, mqttHandler.HandleWaterLevel)
+	}
+
+	handler := middleware.CORSMiddleware(mux)
+
+	log.Printf("server berjalan di :%s", port)
+	if err := http.ListenAndServe(":"+port, handler); err != nil {
+		log.Fatalf("server error: %v", err)
 	}
 
 	log.Println("server berjalan di :8080")
