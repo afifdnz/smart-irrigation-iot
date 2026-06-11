@@ -1,84 +1,84 @@
 # IoT Smart Irrigation Backend
 
-Backend service untuk sistem irigasi pintar (*Smart Irrigation*) yang menghubungkan *hardware node* (ESP8266/Mikrokontroler) dengan *dashboard frontend* (React). Sistem ini dibangun menggunakan **Go (Golang)** dengan menerapkan **Clean Architecture** (Domains, Handler, Service, Repository) serta mendukung protokol komunikasi ganda (HTTP dan MQTT).
+Backend service for a Smart Irrigation system connecting hardware nodes (ESP8266/Microcontrollers) with a frontend dashboard (React). This system is built using **Go (Golang)** applying **Clean Architecture** principles (Domains, Handlers, Services, Repositories) and supports dual communication protocols (HTTP and MQTT).
 
-## 🚀 Fitur Utama
+## 🚀 Key Features
 
 * **Hybrid Ingress (Multi-Protocol):**
-    * **HTTP REST API:** Melayani *request* sinkron dari aplikasi klien (Web/Frontend) untuk manajemen data (CRUD jadwal, plot, autentikasi).
-    * **MQTT Broker Integration:** Menangani komunikasi asinkron dua arah dengan perangkat keras IoT (Telemetri sensor dan kontrol aktuator secara *real-time*).
-* **Real-time Monitoring:** Menerima dan menyimpan pembacaan sensor kelembapan tanah dan ultrasonik (level air tandon) secara presisi.
-* **Actuator Control:** Mengirimkan *command payload* ke mikrokontroler untuk menyalakan/mematikan pompa air atau servo secara manual.
-* **Automated Scheduling:** Manajemen jadwal irigasi otomatis berdasarkan hari aktif, waktu mulai, dan durasi penyiraman.
-* **Security:** Dilengkapi dengan sistem autentikasi JWT (JSON Web Token) dan perlindungan CORS (*Cross-Origin Resource Sharing*).
+    * **HTTP REST API:** Serves synchronous requests from client applications (Web/Frontend) for data management (CRUD operations for schedules, plots, and authentication).
+    * **MQTT Broker Integration:** Handles asynchronous, two-way communication with IoT hardware (Sensor telemetry and real-time actuator control).
+* **Real-time Monitoring:** Receives and stores precise soil moisture and ultrasonic sensor (water tank level) readings.
+* **Actuator Control:** Sends command payloads to microcontrollers to manually turn water pumps or servos on/off.
+* **Automated Scheduling:** Manages automated irrigation schedules based on active days, start time, and watering duration.
+* **Security:** Secured with JWT (JSON Web Token) authentication and CORS (Cross-Origin Resource Sharing) protection.
 
-## 🛠️ Teknologi yang Digunakan
+## 🛠️ Technologies Used
 
-* **Bahasa Pemrograman:** Go (Golang)
+* **Programming Language:** Go (Golang)
 * **Database:** MySQL
-* **Protokol IoT:** MQTT (Paho MQTT Client)
-* **Infrastruktur:** Docker & Docker Compose (Opsional)
+* **IoT Protocol:** MQTT (Paho MQTT Client)
+* **Infrastructure:** Docker & Docker Compose (Optional)
 
-## 📁 Struktur Direktori (Clean Architecture)
+## 📁 Directory Structure (Clean Architecture)
 
-Proyek ini dipisahkan berdasarkan tanggung jawab teknis untuk memastikan kemudahan pemeliharaan dan skalabilitas:
-
+This project is separated based on technical responsibilities to ensure maintainability and scalability:
+```txt
 ├── cmd/
-│   └── main.go                 # Titik masuk utama aplikasi (Inisialisasi HTTP & MQTT)
+│   └── main.go                 # Main application entry point (HTTP & MQTT Initialization)
 ├── internal/
-│   ├── domains/                # Definisi entitas (Struct) dan antarmuka (Interface)
-│   ├── handler/                # Pintu masuk request (HTTP API Controller & MQTT Subscriber)
-│   ├── service/                # Logika bisnis sistem irigasi (Usecase)
-│   └── repository/             # Akses langsung ke database MySQL (Query SQL)
+│   ├── domains/                # Entity definitions (Structs) and contracts (Interfaces)
+│   ├── handler/                # Request entry points (HTTP API Controllers & MQTT Subscribers)
+│   ├── service/                # Irrigation system business logic (Usecases)
+│   └── repository/             # Direct MySQL database access (SQL Queries)
 ├── pkg/
-│   └── middleware/             # Logika penengah seperti JWT Auth & CORS
+│   └── middleware/             # Intermediary logic such as JWT Auth & CORS
 └── go.mod
+```
+## 📡 MQTT Topic Communication Flow
 
-## 📡 Alur Komunikasi Topik MQTT
+The backend actively subscribes to and publishes messages to the broker via the following topics:
 
-Backend secara aktif berlangganan (*subscribe*) dan mempublikasikan (*publish*) pesan ke *broker* melalui topik berikut:
-
-| Topik | Tipe | Format Payload (JSON) | Deskripsi |
+| Topic | Type | Payload Format (JSON) | Description |
 | :--- | :--- | :--- | :--- |
-| `iot/sensors` | Subscribe | `{"plot_id": 1, "soil_moisture_pct": 80}` | Telemetri kelembapan tanah dari ESP8266 |
-| `iot/levels` | Subscribe | `{"tank_id": 1, "water_level_cm": 15}` | Jarak ultrasonik pengukur tandon air |
-| `iot/control/{id}` | Publish | `{"action": "ON"}` | Mengirim perintah aktuasi pompa ke ESP8266 |
+| `iot/sensors` | Subscribe | `{"plot_id": 1, "soil_moisture_pct": 80}` | Soil moisture telemetry from ESP8266 |
+| `iot/levels` | Subscribe | `{"tank_id": 1, "water_level_cm": 15}` | Ultrasonic distance for water tank level |
+| `iot/control/{id}` | Publish | `{"action": "ON"}` | Sends pump actuation commands to ESP8266 |
 
-## ⚙️ Prasyarat (Prerequisites)
+## ⚙️ Prerequisites
 
-Sebelum menjalankan aplikasi, pastikan sistem Anda telah terinstal:
-* [Go](https://go.dev/) (versi 1.18 atau terbaru)
+Before running the application, ensure your system has the following installed:
+* [Go](https://go.dev/) (version 1.18 or newer)
 * MySQL Server
-* MQTT Broker (seperti Eclipse Mosquitto, EMQX, atau HiveMQ)
-* Docker (Opsional, untuk kontainerisasi)
+* MQTT Broker (e.g., Eclipse Mosquitto, EMQX, or HiveMQ)
+* Docker (Optional, for containerization)
 
-## 🔧 Instalasi & Konfigurasi
+## 🔧 Installation & Configuration
 
-1.  **Kloning repositori ini:**
+1.  **Clone this repository:**
     git clone https://github.com/username/irrigation-backend.git
     cd irrigation-backend
 
-2.  **Instal dependensi:**
+2.  **Install dependencies:**
     go mod tidy
 
-3.  **Pengaturan Environment Variables:**
-    Atur variabel lingkungan di dalam file `.env` atau langsung di *environment* sistem Anda:
+3.  **Environment Variables Setup:**
+    Set the environment variables in a `.env` file or directly in your system environment:
     PORT=8080
     DB_DSN=user_iot:password_iot@tcp(localhost:3307)/iot_irrigation_db?parseTime=true&loc=UTC
     MQTT_BROKER=tcp://localhost:1883
-    JWT_SECRET=rahasia_sistem_anda
+    JWT_SECRET=your_system_secret
     
-    *(Catatan: Penambahan parameter `?parseTime=true&loc=UTC` pada DSN sangat krusial agar Go dapat melakukan pemindaian tipe data waktu SQL secara akurat).*
+    *(Note: Adding the `?parseTime=true&loc=UTC` parameter to the DSN is crucial for Go to accurately parse SQL time data types).*
 
-## ▶️ Menjalankan Aplikasi
+## ▶️ Running the Application
 
-**Secara Lokal (Tanpa Docker):**
+**Locally (Without Docker):**
 go run cmd/main.go
 
-**Menggunakan Docker Compose:**
-Jika Anda telah menyertakan `docker-compose.yml`, jalankan perintah berikut untuk menginisiasi server Go bersamaan dengan MySQL dan MQTT Broker:
+**Using Docker Compose:**
+If you have included the `docker-compose.yml`, run the following command to initiate the Go server alongside MySQL and the MQTT Broker:
 docker-compose up -d --build
 
-Setelah aplikasi berjalan, log inisialisasi akan muncul di terminal:
+Once the application is running, the initialization logs will appear in your terminal:
 Berhasil terhubung ke MQTT Broker
 server berjalan di :8080
